@@ -101,9 +101,11 @@ async function addIntern() {
     })
 }
 
+// primary function to get input for type of employee
 async function getUserInput() {
     let memberToAdd;
 
+    // prompt user for type of employee to be added
     const userInput = await inquirer.prompt([
         {
             type: 'list',
@@ -112,8 +114,11 @@ async function getUserInput() {
             name: 'memberType'
         }
     ]).then(function (response) {
+        // asign the type of member to add to a variable
         memberToAdd = response.memberType
     })
+
+    // call the appropriate function to create an employee based on user's input
     switch (memberToAdd) {
         case 'manager':
             const managerAdd = await addManager()
@@ -126,6 +131,7 @@ async function getUserInput() {
             break
     }
 
+    // prompt user for adding any more employees
     const addMoreInput = await inquirer.prompt([
         {
             type: 'list',
@@ -134,10 +140,19 @@ async function getUserInput() {
             name: 'addMore'
         }
     ]).then(function(response) {
+        // if 'yes', recursively call current function to run again
         if (response.addMore === 'YES') {
             getUserInput()
         } else {
-            console.log(render(employeesArr))
+            // if 'no', render the current employees and create and html file
+            fs.writeFile(outputPath, render(employeesArr), function(err) {
+                // throw and error if it occurs
+                if (err) {
+                    throw err
+                }
+                // if no error occurs, let user know the html file has been created
+                console.log('HTML file with employees has been created!')
+            })
         }
     })
 }
