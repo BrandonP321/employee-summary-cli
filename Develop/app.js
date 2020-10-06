@@ -10,9 +10,140 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
+const employeesArr = []
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
+async function addManager() {
+    const managerInput = await inquirer.prompt([
+        {
+            type: 'input',
+            message: "What is the manager's name?",
+            name: 'name'
+        },
+        {
+            type: 'input',
+            message: "What is the manager's ID?",
+            name: 'id'
+        },
+        {
+            type: 'input',
+            message: "What is the manager's email?",
+            name: 'email'
+        },
+        {
+            type: "input",
+            message: "What is the manager's office number?",
+            name: 'officeNumber'
+        }
+    ]).then(function(response) {
+        const {name, id, email, officeNumber} = response
+        const newManager = new Manager(name, id, email, officeNumber)
+        employeesArr.push(newManager)
+    })
+}
+
+async function addEngineer() {
+    const engineerInput = await inquirer.prompt([
+        {
+            type: 'input',
+            message: "What is the engineer's name?",
+            name: 'name'
+        },
+        {
+            type: 'input',
+            message: "What is the engineer's ID?",
+            name: 'id'
+        },
+        {
+            type: 'input',
+            message: "What is the engineer's email?",
+            name: 'email'
+        },
+        {
+            type: "input",
+            message: "What is the engineer's Github username?",
+            name: 'gitUserName'
+        }
+    ]).then(function(response) {
+        const {name, id, email, gitUserName} = response
+        const newEnginner = new Engineer(name, id, email, gitUserName)
+        employeesArr.push(newEnginner)
+    })
+}
+
+async function addIntern() {
+    const internInput = await inquirer.prompt([
+        {
+            type: 'input',
+            message: "What is the intern's name?",
+            name: 'name'
+        },
+        {
+            type: 'input',
+            message: "What is the intern's ID?",
+            name: 'id'
+        },
+        {
+            type: 'input',
+            message: "What is the intern's email?",
+            name: 'email'
+        },
+        {
+            type: "input",
+            message: "Where is the intern going to school?",
+            name: 'school'
+        }
+    ]).then(function(response) {
+        const {name, id, email, school} = response
+        const newIntern = new Intern(name, id, email, school)
+        employeesArr.push(newIntern)
+    })
+}
+
+async function getUserInput() {
+    let memberToAdd;
+
+    const userInput = await inquirer.prompt([
+        {
+            type: 'list',
+            message: 'What type of team member would you like to add?',
+            choices: ['manager', 'engineer', 'intern'],
+            name: 'memberType'
+        }
+    ]).then(function (response) {
+        memberToAdd = response.memberType
+    })
+    switch (memberToAdd) {
+        case 'manager':
+            const managerAdd = await addManager()
+            break
+        case 'engineer':
+            const engineerAdd = await addEngineer()
+            break
+        case 'intern':
+            const internAdd = await addIntern()
+            break
+    }
+
+    const addMoreInput = await inquirer.prompt([
+        {
+            type: 'list',
+            message: 'Would you like to add another team member?',
+            choices: ['YES', 'NO'],
+            name: 'addMore'
+        }
+    ]).then(function(response) {
+        if (response.addMore === 'YES') {
+            getUserInput()
+        } else {
+            console.log(render(employeesArr))
+        }
+    })
+}
+
+getUserInput()
+
 
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
